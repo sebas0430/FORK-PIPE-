@@ -38,15 +38,21 @@ int main(int argc, char *argv[])
         fscanf(archivo01, "%d", &arreglo01[i]);
         }
 //---------------------------------------------------------------------------------
-//procesos
+//procesos y pipes
+
     int pipeNieto[2];     // nieto -> primer hijo
     int pipeSegundo[2];   // segundo hijo -> primer hijo
     int pipeTotal[2];     // primer hijo -> padre
+
+//pipr[0] = lectura
+//pipe[1] = escribir
 
     pipe(pipeNieto);
     pipe(pipeSegundo);
     pipe(pipeTotal);
 
+//se crea el proceso del primer hijo que recibe los resultados del 
+//segundo hijo y del nieto
 int primerHijo = fork();
 if(primerHijo == 0)
 {
@@ -55,22 +61,27 @@ if(primerHijo == 0)
 close(pipeSegundo[1]);
 close(pipeNieto[1]);
 
+//para guardar los resultados del segundo hijo y del nieto
 int contador00;
 int contador01;
 
+//se lee lo que esta en el pipe del segundo hijo y del nieto
 read(pipeSegundo[0],&contador01,sizeof(int));
 read(pipeNieto[0],&contador00,sizeof(int));
 
+//se realiza la suma de ambos
 int total = contador01  + contador00;
 
 close(pipeTotal[0]);
+//escribo los resultados dentro del pipe total para poder mandarlos al padre
+//y imprimirlos
 write(pipeTotal[1],&total,sizeof(int));
 write(pipeTotal[1],&contador01,sizeof(int));
 write(pipeTotal[1],&contador00,sizeof(int));
 
 
 close(pipeTotal[1]);
-
+//termina el proceso
 exit(0);
 
 
@@ -83,6 +94,7 @@ exit(0);
 int segundoHijo = fork();
 if(segundoHijo == 0)
 {
+//se crea un pipe interno para el nieto y poder enviar desde este
    int pipNietoInterno[2];
    pipe(pipNietoInterno);
 
@@ -95,6 +107,7 @@ for(int i = 0; i<numero00;i++)
 	{contador00+=arreglo00[i];}
 
 	close(pipNietoInterno[0]);
+	//se escribe dentro del pipe el resultado
 	write(pipNietoInterno[1], &contador00, sizeof(int));
 	close(pipNietoInterno[1]);
 	exit(0);
@@ -103,10 +116,12 @@ for(int i = 0; i<numero00;i++)
 //leer lo del nieto y guardar su contador dentro del segundo hijo
 int contador00;
 close(pipNietoInterno[1]);
+//se lee el resultado del nieto
 read(pipNietoInterno[0],&contador00,sizeof(int));
 close(pipNietoInterno[0]);
 //enviar al primer hijo el resultado del nieto
 close(pipeNieto[0]);
+//se escribe el resultado del nieto dentro de su pipe
 write(pipeNieto[1],&contador00,sizeof(int));
 close(pipeNieto[1]);
 
@@ -120,34 +135,40 @@ for(int i = 0 ; i< numero01 ;i++)
 	close(pipeSegundo[0]);
 	write(pipeSegundo[1],&contador01,sizeof(int));
 	close(pipeSegundo[1]);
-	wait(NULL);
+	wait(NULL);//para esperar que el proceso nieto termine
+	//finalizacion del proceso
 	exit(0);
 }//aca termina el segundo hijo
 
+
+//cierro todos los canales que no voy a usar
     close(pipeNieto[1]);
     close(pipeNieto[0]);
     close(pipeSegundo[1]);
     close(pipeSegundo[0]);
     close(pipeTotal[1]);
-
+//creo las variables para guardar la informacion
     int resultadoFinal;
     int resultadoSegundoHijo;
     int resultadoNieto;
 
+//la leo en el orden que se guardo (FIFO)
     read(pipeTotal[0], &resultadoFinal, sizeof(int));
     read(pipeTotal[0], &resultadoSegundoHijo, sizeof(int));
     read(pipeTotal[0], &resultadoNieto, sizeof(int));
 
+//imprimo desde el padre los resultados de todo
     printf("\nResultado del nietoo: %d\n", resultadoNieto);
     printf("\nResultado del segundo hijo: %d\n", resultadoSegundoHijo);
     printf("\nResultado final desde primer hijo: %d\n", resultadoFinal);
-
+//cierro la lectura
     close(pipeTotal[0]);
     wait(NULL); // primer hijo
     wait(NULL); // segundo hijo
-
+	//cierro los archivos
 	fclose(archivo00);
 	fclose(archivo01);
+	//libero memoria de los arreglos
 	free(arreglo01);
 	free(arreglo00);
 
