@@ -4,11 +4,11 @@ Este proyecto implementa un programa en C que utiliza procesos y comunicación e
 ## Compilación
 ```bash
 # Compilación del programa
-gcc -o taller_procesos taller_procesos.c
+gcc main.c -o ejecutable
 
 # Ejecución del programa
-./taller_procesos 5 archivo00.txt 4 archivo01.txt
-jecutable 5 archivo00.txt 4 archivo01.txt
+./ejecutableCreate  5 archivo00.txt 4 archivo01.txt
+
 ```
 #### 📂 4. **Estructura de archivos**
 Describe brevemente para qué sirve cada archivo.
