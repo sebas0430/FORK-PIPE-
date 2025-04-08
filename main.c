@@ -158,9 +158,9 @@ for(int i = 0 ; i< numero01 ;i++)
     read(pipeTotal[0], &resultadoNieto, sizeof(int));
 
 //imprimo desde el padre los resultados de todo
-    printf("\nResultado del nietoo: %d\n", resultadoNieto);
-    printf("\nResultado del segundo hijo: %d\n", resultadoSegundoHijo);
-    printf("\nResultado final desde primer hijo: %d\n", resultadoFinal);
+    printf("\nResultado del nieto(suma de arreglo archivo00): %d\n", resultadoNieto);
+    printf("\nResultado del segundo hijo(suma de arreglo archivo01): %d\n", resultadoSegundoHijo);
+    printf("\nResultado final desde primer hijo(suma de ambos arreglos): %d\n", resultadoFinal);
 //cierro la lectura
     close(pipeTotal[0]);
     wait(NULL); // primer hijo
