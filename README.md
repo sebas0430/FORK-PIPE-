@@ -1,5 +1,5 @@
-# Taller 02 - Sistemas Operativos
-## Descripcion
+
+# Descripcion
 Este proyecto implementa un programa en C que utiliza procesos y comunicación entre ellos mediante `fork()` y `pipe()`. Forma parte del Taller 02 del curso de Sistemas Operativos.
 ## Compilación
 ```bash
